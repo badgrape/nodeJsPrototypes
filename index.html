@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>bad jS website</title>
+
+<style type="text/css">
+  body {font-family: sans-serif;}
+  th, td {text-align: left; padding: 10px;}
+  th {font-weight: 500; background-color: #ececec;}
+</style>
+
+<script type="text/javascript" src="jquery-3.2.1.min.js"></script>
+
+<script type="text/javascript">
+function sendData() {
+  var formData = postify($("form").serializeArray());
+
+  // AJAX request and response: parameters = server, data, callback
+  $.post("http://localhost:8080", JSON.stringify(formData),
+  function(data, status) {
+      // Print JSON string in browser: debugging
+      //$('#data').html(data);
+
+      console.log(JSON.parse(data)); // debugging
+
+      // Clear form
+      $('form').each(function() {
+        this.reset();
+      });
+
+      fillTable(JSON.parse(data));
+  });
+}
+
+// Convert form data into an object that resembles the PHP $POST array.
+// Makes data easier to access on server side.
+function postify(clientData) {
+  var post = {};
+  for (var i = 0; i < Object.keys(clientData).length; i++) {
+	   post[clientData[i]['name']] = clientData[i]['value'];
+   }
+   return post;
+}
+
+// Populate table with response data
+function fillTable(records) {
+  var tbody = $('table tbody');
+
+  // clear tbody with every submission
+  $(tbody).html('');
+
+  for (var i = 0; i < Object.keys(records).length; i++) {
+    var tr = '<tr><td>' + records[i]['something'] + '</td>';
+    tr += '<td>' + records[i]['selse'] + '</td></tr>';
+    $(tbody).append(tr);
+  }
+}
+</script>
+
+</head>
+
+<body>
+
+<form action="javascript:sendData()" method="post">
+<label for="something">Write something:</label>
+<input type="text" id="something" name="something" required="required" />
+<label for="selse">Write something else:</label>
+<input type="text" id="selse" name="selse" required="required" />
+<input type="submit" id="go" name="go" value="Go!" />
+</form>
+
+<hr />
+
+<div id="data"><!-- debugging --></div>
+
+<table>
+  <tr><th>Something</th><th>Something else</th></tr>
+  <!-- Data added by fillTable() -->
+</table>
+
+</body>
+</html>
